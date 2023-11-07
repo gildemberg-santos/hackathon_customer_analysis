@@ -38,10 +38,9 @@ class Predict:
 
     def __x(self) -> pd.DataFrame:
         return self.dataset[self.x]
-    
+
     def __y(self) -> pd.Series:
         return self.dataset[self.y]
-    
+
     def __train_test_split(self) -> None:
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.__x(), self.__y(), test_size=0.25, random_state=0)
-
