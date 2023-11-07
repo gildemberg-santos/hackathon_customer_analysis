@@ -1,3 +1,6 @@
+"""
+Biblioteca para treinar e salvar um modelo de regressão logística.
+"""
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -11,6 +14,9 @@ class Predict:
         self.x = x
         self.y = y
         self.__train_test_split()
+        self.y_pred = None
+        self.logistic_regression = None
+        self.accuracy = None
 
     def save(self) -> None:
         self.__train()
