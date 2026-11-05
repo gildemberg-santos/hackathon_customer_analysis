@@ -1,4 +1,4 @@
-""" Importação de bliblitecas para transformação de dados e criação do modelo """
+""" Importação de bibliotecas para transformação de dados e criação do modelo """
 import pandas as pd
 from src.predict import Predict
 
