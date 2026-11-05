@@ -7,8 +7,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 import joblib
 
-class Predict:
-    def __init__(self, path: str, dataset: pd.DataFrame, x: tuple, y: str) -> None:
+class Predict:  # pylint: disable=too-many-instance-attributes
+    """Treina, avalia e persiste uma regressão logística sobre colunas de um DataFrame."""
+
+    def __init__(self, path: str, dataset: pd.DataFrame, x: list[str], y: str) -> None:
         self.path = path
         self.dataset = dataset
         self.x = x
@@ -19,10 +21,12 @@ class Predict:
         self.accuracy = None
 
     def save(self) -> None:
+        """Treina o modelo, calcula a acurácia no conjunto de teste e salva em `<path>.pkl`."""
         self.__train()
-        self.y_pred = joblib.dump(self.logistic_regression, self.__path())
+        joblib.dump(self.logistic_regression, self.__path())
 
     def load(self) -> None:
+        """Carrega o modelo salvo e recalcula predições e acurácia no conjunto de teste."""
         self.logistic_regression = joblib.load(self.__path())
         self.y_pred = self.logistic_regression.predict(self.x_test)
         self.accuracy = metrics.accuracy_score(self.y_test, self.y_pred)
@@ -43,4 +47,6 @@ class Predict:
         return self.dataset[self.y]
 
     def __train_test_split(self) -> None:
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.__x(), self.__y(), test_size=0.25, random_state=0)
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+            self.__x(), self.__y(), test_size=0.25, random_state=0
+        )

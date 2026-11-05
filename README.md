@@ -1,18 +1,61 @@
 # Hackathon Customer Analysis
 
-## Análise de Clientes com Maior Potencial de Fechamento de Venda
-Este projeto inovador, desenvolvido em **Python**, tem como objetivo **identificar e analisar os clientes com maior probabilidade de fechamento de venda**, considerando o segmento de atuação de cada empresa. A análise eficiente de clientes é essencial para o sucesso comercial, e este sistema automatizado torna o processo mais ágil, preciso e estratégico.
+[![CI](https://github.com/gildemberg-santos/hackathon_customer_analysis/actions/workflows/pylint.yml/badge.svg)](https://github.com/gildemberg-santos/hackathon_customer_analysis/actions/workflows/pylint.yml)
 
-## Funcionalidades Principais
-- **Coleta Inteligente de Dados** O sistema realiza a captação de informações essenciais dos clientes, incluindo **nome, empresa, cargo, histórico de compras, interações anteriores** e outros atributos relevantes, permitindo uma análise profunda e personalizada.
+Protótipo construído em um hackathon (2023) para responder a uma pergunta comercial: **quais leads têm mais chance de fechar a compra?**
 
-- **Segmentação Estratégica de Clientes** Com base nos dados coletados, os clientes são agrupados em segmentos com características semelhantes, proporcionando uma visão mais clara e permitindo que as empresas direcionem suas ações de maneira eficaz. A segmentação pode ser **personalizada conforme as necessidades do negócio**.
+O modelo é uma regressão logística treinada com o histórico de vendas de veículos. Cada lead é descrito pelo valor da venda, pelo veículo de interesse e por atributos financeiros, e o modelo estima se a venda foi concluída (`sale_sold`).
 
-- **Avaliação Inteligente do Potencial de Venda** Por meio de **modelos avançados de aprendizado de máquina**, o sistema analisa as características dos clientes para determinar seu potencial de conversão. Dessa forma, a equipe comercial pode **priorizar esforços nos clientes mais promissores** e aumentar a taxa de sucesso nas negociações.
+## Como funciona
 
-- **Recomendações Personalizadas de Abordagem** Com base na avaliação do potencial de venda e no segmento de cada cliente, o sistema **sugere estratégias de abordagem sob medida**, auxiliando os times de vendas a construírem interações mais assertivas e direcionadas.
+1. Lê o histórico de `data/exported_data.csv`.
+2. Separa 75% dos registros para treino e 25% para teste (`random_state=0`, resultado reproduzível).
+3. Treina uma `LogisticRegression` do scikit-learn e mede a acurácia no conjunto de teste.
+4. Salva o modelo em `data/modelo.pkl` para ser reaproveitado sem novo treino.
 
-## Benefícios do Projeto
-✅ **Automação Inteligente:** Redução do esforço manual, permitindo que as equipes foquem no que realmente importa: fechar negócios. ✅ **Eficiência Comercial:** Direcionamento assertivo das estratégias de vendas, aumentando a conversão de leads qualificados. ✅ **Tomada de Decisão Aprimorada:** Insights baseados em dados para otimizar o planejamento e execução das estratégias comerciais.
+Colunas usadas como entrada:
 
-Este projeto é a solução ideal para empresas que desejam **maximizar suas oportunidades de vendas, aprimorar a experiência do cliente e impulsionar seus resultados de forma inteligente e automatizada**.
+| Coluna | Significado |
+|---|---|
+| `sale_amount` | Valor da venda |
+| `sale_vehicle_id` | Veículo negociado |
+| `vehicle_year` | Ano do veículo |
+| `vehicle_price` | Preço do veículo |
+| `lead_bank_score` | Score bancário do lead |
+| `lead_have_children` | Lead tem filhos |
+| `lead_years_employment` | Anos no emprego atual |
+| `lead_income` | Renda do lead |
+
+## Rodando
+
+```sh
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+# coloque o histórico em data/exported_data.csv (não versionado)
+python main.py
+```
+
+O script imprime a acurácia no conjunto de teste e as predições.
+
+## Testes
+
+```sh
+pip install pytest pylint
+pytest -q
+pylint $(git ls-files '*.py')
+```
+
+Os testes usam um conjunto sintético, então rodam sem os dados reais. O GitHub Actions executa lint e testes em Python 3.10, 3.11 e 3.12.
+
+## Limitações e próximos passos
+
+Como protótipo de hackathon, o projeto deixa de lado pontos que um modelo em produção precisaria:
+
+- `sale_vehicle_id` entra como número, mas é categórico; deveria ser codificado (one-hot ou target encoding).
+- Não há normalização das variáveis numéricas nem tratamento de valores ausentes.
+- Acurácia sozinha engana quando poucas vendas fecham; precisão, recall e AUC dariam uma visão melhor.
+- O próximo passo natural é expor a predição por uma API e devolver a probabilidade de fechamento, não só a classe.
+
+## Licença
+
+[MIT](LICENSE)
